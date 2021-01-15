@@ -1,0 +1,6 @@
+[submodule "libxml2"]
+	path = libxml2
+	url = https://gitlab.gnome.org/GNOME/libxml2
+[submodule "whois-server-list"]
+	path = whois-server-list
+	url = https://github.com/whois-server-list/whois-server-list

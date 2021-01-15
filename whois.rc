@@ -1,0 +1,3 @@
+#include "resource.h"
+
+XML_DATA                XML_RC                  "whois-server-list\\whois-server-list.xml"
