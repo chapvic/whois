@@ -1,4 +1,5 @@
 #include "whois.h"
+#include <tchar.h>
 
 static bool __cdecl whois_query(whois_ptr whois) {
 	static char recvbuf[SOCK_RECV_BUFFER + 1];
@@ -22,7 +23,7 @@ static bool __cdecl whois_query(whois_ptr whois) {
 		// Initialize Winsock
 		status = WSAStartup(MAKEWORD(2, 2), &wsaData);
 		if (status != 0) {
-			printf("WSAStartup failed with error: %d\n", status);
+			printf("Fatal: WSAStartup failed with error: %d\n", status);
 			return retval;
 		}
 
@@ -35,7 +36,7 @@ static bool __cdecl whois_query(whois_ptr whois) {
 		status = getaddrinfo(whois->servers->items[whois->req], "43", &addr, &result);
 //		status = getaddrinfo("whois.net.ru", "43", &addr, &result);
 		if (status != 0) {
-			printf("getaddrinfo failed with error: %d\n", status);
+			printf("Error: Unable to resolve address for server %s!\n", whois->servers->items[whois->req]);
 			goto Exit;
 		}
 
@@ -45,14 +46,14 @@ static bool __cdecl whois_query(whois_ptr whois) {
 			// Create a SOCKET for connecting to server
 			ConnectSocket = socket(ptr->ai_family, ptr->ai_socktype, ptr->ai_protocol);
 			if (ConnectSocket == INVALID_SOCKET) {
-				printf("socket failed with error: %ld\n", WSAGetLastError());
+				printf("Fatal: 'socket' failed with error: %ld\n", WSAGetLastError());
 				goto Exit;
 			}
 
 			unsigned long iMode = 1;	//(0 = blocking mode, 1 = non-blocking mode)
 			status = ioctlsocket(ConnectSocket, FIONBIO, &iMode);
 			if (status != NO_ERROR) {
-				printf("ioctlsocket failed with error: %ld\n", status);
+				printf("Fatal: 'ioctlsocket' failed with error: %ld\n", status);
 				closesocket(ConnectSocket);
 				goto Exit;
 			}
@@ -74,20 +75,20 @@ static bool __cdecl whois_query(whois_ptr whois) {
 		FD_SET(ConnectSocket, &readSet);
 		int ready = select(ConnectSocket, NULL, &readSet, NULL, &sendTimeout);
 		if (ready < 1) {
-			printf("select failed with error: %d\n", WSAGetLastError());
+			printf("Fatal: 'select' failed with error: %d\n", WSAGetLastError());
 			closesocket(ConnectSocket);
 			goto Exit;
 		}
 
 		if (ConnectSocket == INVALID_SOCKET) {
-			printf("Unable to connect to server!\n");
+			puts("Error: Unable to connect to server!\n");
 			goto Exit;
 		}
 
 		// Send an initial buffer
 		status = send(ConnectSocket, whois->query, (int)strlen(whois->query), 0);
 		if (status == SOCKET_ERROR) {
-			printf("send failed with error: %d\n", WSAGetLastError());
+			printf("Fatal: 'send' failed with error: %d\n", WSAGetLastError());
 			closesocket(ConnectSocket);
 			goto Exit;
 		}
@@ -96,7 +97,7 @@ static bool __cdecl whois_query(whois_ptr whois) {
 		FD_SET(ConnectSocket, &readSet);
 		ready = select(ConnectSocket, &readSet, NULL, NULL, &selTimeout);
 		if (ready < 1) {
-			printf("select failed with error: %d\n", WSAGetLastError());
+			printf("Fatal: 'select' failed with error: %d\n", WSAGetLastError());
 			closesocket(ConnectSocket);
 			goto Exit;
 		}
@@ -105,7 +106,7 @@ static bool __cdecl whois_query(whois_ptr whois) {
 		/*
 		status = shutdown(ConnectSocket, SD_SEND);
 		if (status == SOCKET_ERROR) {
-			printf("shutdown failed with error: %d\n", WSAGetLastError());
+			printf("Fatal: 'shutdown' failed with error: %d\n", WSAGetLastError());
 			closesocket(ConnectSocket);
 			goto Exit;
 		}
@@ -119,7 +120,7 @@ static bool __cdecl whois_query(whois_ptr whois) {
 				fprintf_s(whois->file, "%s", recvbuf);
 			}
 			else if (status < 0) {
-				printf("recv failed with error: %d\n", WSAGetLastError());
+				printf("Fatal: 'recv' failed with error: %d\n", WSAGetLastError());
 			}
 		} while (status > 0);
 		closesocket(ConnectSocket);

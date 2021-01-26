@@ -6,7 +6,7 @@ RM = del
 
 WHOIS_EXE = whois.exe
 WHOIS_RES = whois.res
-WHOIS_OBJ = main.obj memory.obj array.obj xmldb.obj socks.obj whois.obj
+WHOIS_OBJ = main.obj memory.obj array.obj xmldb.obj optarg.obj socks.obj whois.obj
 
 LIBXML_LIB = libxml2.lib
 LIBXML_OBJ = buf.obj c14n.obj catalog.obj chvalid.obj debugXML.obj dict.obj DOCBparser.obj encoding.obj entities.obj error.obj globals.obj \
@@ -15,7 +15,7 @@ LIBXML_OBJ = buf.obj c14n.obj catalog.obj chvalid.obj debugXML.obj dict.obj DOCB
 	xmlregexp.obj xmlsave.obj xmlschemas.obj xmlschemastypes.obj xmlstring.obj xmlunicode.obj xmlwriter.obj xpath.obj xpointer.obj \
 	trio.obj trionan.obj triostr.obj
 
-CFLAGS = /c /nologo /MD /D "_CRT_SECURE_NO_DEPRECATE" /D "_CRT_NONSTDC_NO_DEPRECATE" /D "_MBCS" /D "LIBXML_STATIC" /I "config" /I "libxml2/include"
+CFLAGS = /c /nologo /MT /D "_CRT_SECURE_NO_DEPRECATE" /D "_CRT_NONSTDC_NO_DEPRECATE" /D "_MBCS" /D "LIBXML_STATIC" /I "config" /I "libxml2/include"
 CFLAGS_LIBXML = $(CFLAGS) /D "_REENTRANT" /D "HAVE_WIN32_THREADS" /D "NOLIBTOOL"
 CFLAGS_WHOIS = $(CFLAGS) /I "whois"
 

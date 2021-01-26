@@ -16,18 +16,20 @@
 #include <libxml/xmlreader.h>
 #include <libxml/xpath.h>
 
-#define malloc(s) HeapAlloc(GetProcessHeap(),HEAP_ZERO_MEMORY,(s))
-#define realloc(p,s) HeapReAlloc(GetProcessHeap(),HEAP_ZERO_MEMORY,(p),(s))
-#define free(p) HeapFree(GetProcessHeap(),0,(p))
-#define msize(p) HeapSize(GetProcessHeap(),0,(p))
+#include "memory.h"
+
+#undef _tputs
+#ifdef _MBCS
+#define _tputs puts
+#else
+#define _tputs _putws
+#endif // UNICODE
 
 // Maximum XML path length for XPath Query
 #define XMLDB_PATH_LEN 512
 
 extern char* error_str;
 extern int error_val;
-
-
 
 // ---------------
 // array.c
@@ -43,15 +45,6 @@ char* __cdecl implode(array_ptr arr, char sep);
 array_ptr __cdecl array_new(size_t size);
 void __cdecl array_free(array_ptr arr);
 bool __cdecl array_set(array_ptr arr, size_t index, char* value);
-
-// ---------------
-// memory.c
-// ---------------
-
-void* __cdecl mallocz(size_t size);
-void* __cdecl bcopy(void* src, size_t size);
-char* __cdecl concat_s(char* str1, char* str2, char sep);
-char* __cdecl concat(char* str1, char* str2);
 
 // ---------------
 // socks.c
@@ -110,14 +103,6 @@ typedef struct _sockopt {
 
 bool sock_send(sockopt_ptr opt);
 void sock_close(sockopt_ptr opt);
-
-// ---------------
-// optarg.c
-// ---------------
-
-typedef struct _optarg {
-	int s;
-} optarg_t, *optarg_ptr;
 
 // ---------------
 // xmldb.c
